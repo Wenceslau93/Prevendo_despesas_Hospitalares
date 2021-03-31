@@ -1,0 +1,118 @@
+---
+title: "Prevendo despesas Hospitalares"
+author: "Diego"
+date: "30/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<br/>
+
+#### Este projeto tem como objetivo realizar previsões de despesas Hospitalares em base de características de pessoas.
+
+<br/>
+
+**Definindo local de trabalho**
+```{r}
+setwd("C:/FCD/GitHub/Data-Science-e-BI-master/R/Prevendo Despesas Hospitalares")
+getwd()
+```
+
+**Carregando e visualizando o arquivo**
+```{r}
+despesas <- read.csv("despesas.csv")
+head(despesas, 5)
+```
+
+**Resumo**
+```{r}
+summary(despesas)
+```
+
+```{r}
+str(despesas)
+```
+
+
+**Visualizando em um gráfico**
+```{r}
+hist(despesas$gastos,  
+     main = "Prevendo despesas Hospitalares", 
+     xlab = "Gastos", ylab = "Frequencia. Absoluta", 
+     col = c("violet"), 
+     border = FALSE, 
+     ylim = c(0,400),
+     labels = TRUE)
+```
+
+**Visualizando a quantidade de dados de regiões**
+```{r}
+table(despesas$regiao)
+```
+
+**Visualizando correlação de váriaveis númericas**
+```{r}
+library("corrplot")
+correlacao <- cor(despesas[c("idade", "bmi", "filhos", "gastos")])
+corrplot(correlacao, method="color", tl.cex = 1, type="full", addCoef.col = "black")
+```
+
+**Treinando o modelo**
+```{r}
+modelo <- lm(gastos ~ ., data = despesas)
+modelo
+```
+
+**Realizando previsão do modelo**
+```{r}
+despesas2 <- despesas
+despesas2$previsao1 <- predict(modelo)
+head(despesas2, 5)
+```
+
+**Avaliando o modelo**
+```{r}
+summary(modelo)
+```
+
+**Realizando segunda previsão com váriaveis mais importantes**
+```{r}
+despesas3 <- despesas
+despesas3$fumanteSim <- ifelse(despesas3$fumante == "sim", 1, 0)
+despesas3$bmi30 <- ifelse(despesas$bmi >= 30, 1, 0)
+
+modelo2 <- lm(gastos ~ idade + filhos + bmi30 * fumanteSim, data = despesas3)
+```
+
+**Avaliando segundo modelo**
+```{r}
+summary(modelo2)
+```
+
+**Previsao com os dados de teste**
+```{r}
+teste <- read.csv("despesas-teste2.csv", header = TRUE, sep = ";")
+head(teste, 5)
+
+prev <- predict(modelo2, teste)
+```
+
+**Criando nova variável e arredondando a coluna preditora **
+```{r}
+teste$prev <- prev
+teste$prev <- ceiling(teste$prev)
+head(teste, 5)
+```
+
+```{r}
+typeof(teste$prev)
+```
+
+
+**Salvando o arquivo csv**
+```{r}
+write.csv(teste, "power_bi.csv")
+```
