@@ -12,7 +12,7 @@ No final do projeto, é criado um arquivo que é manipulado no Power BI.
 <br/>
 
 <center>Imagem do Power BI:</center>
-
+<br/>
 <center>
 <p align="center">
 <img src="https://github.com/Wenceslau93/Prevendo_despesas_Hospitalares/blob/main/Despesas.PNG" alt="some text">
